@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --rose:#C8737B;--rose-deep:#A04E58;--rose-dark:#6D2E3A;
+  --blush:#F7E8E8;--sage:#7A9E8E;
+  --charcoal:#1E1C1B;--mid:#6B6560;--light:#F5F3F1;
+  --border:#E8E3DF;--white:#FFFFFF;
+}
+html,body{margin:0;padding:0;background:var(--white);color:var(--charcoal);font-family:'DM Sans',sans-serif;font-size:16px;overflow-x:hidden;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* ── NAV ── */
+.nav{
+  width:100%;height:66px;
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 52px;
+}
+.nav-logo{display:flex;align-items:center;gap:11px;cursor:pointer;}
+.nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--rose-dark);line-height:1;}
+.nav-logo-sub{font-size:8.5px;letter-spacing:0.15em;text-transform:uppercase;color:var(--mid);margin-top:3px;}
+.nav-links{display:flex;align-items:stretch;height:66px;list-style:none;}
+.nav-li{position:relative;display:flex;align-items:center;}
+.nav-a{display:flex;align-items:center;gap:4px;height:66px;padding:0 13px;font-size:12px;font-weight:400;letter-spacing:0.06em;text-transform:uppercase;color:var(--mid);white-space:nowrap;border-bottom:2px solid transparent;transition:color .18s,border-color .18s;cursor:pointer;}
+.nav-a.active-page,.nav-li:hover .nav-a{color:var(--rose-deep);border-bottom-color:var(--rose);}
+.nav-a svg{transition:transform .2s;}
+.nav-li:hover .nav-a svg{transform:rotate(180deg);}
+.nav-drop{position:absolute;top:66px;left:0;min-width:230px;background:var(--white);border:1px solid var(--border);border-top:2px solid var(--rose);opacity:0;pointer-events:none;transform:translateY(4px);transition:opacity .18s,transform .18s;z-index:600;}
+.nav-li:hover .nav-drop{opacity:1;pointer-events:auto;transform:translateY(0);}
+.nav-drop a{display:block;padding:11px 18px;font-size:13.5px;font-weight:300;color:var(--charcoal);border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer;}
+.nav-drop a:last-child{border-bottom:none;}
+.nav-drop a:hover{background:var(--light);}
+.nav-drop-sub{display:block;font-size:11.5px;color:var(--mid);margin-top:2px;}
+.nav-cta{background:var(--rose-dark);color:#fff;padding:10px 22px;border-radius:2px;font-size:11.5px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;transition:background .18s;margin-left:16px;flex-shrink:0;cursor:pointer;}
+.nav-cta:hover{background:var(--rose);}
+
+/* ── SHARED ── */
+.sec-label{font-size:10.5px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--rose);display:flex;align-items:center;gap:8px;margin-bottom:18px;}
+.sec-label::before{content:'';width:20px;height:1px;background:var(--rose);}
+.sec-h{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,3.4vw,48px);font-weight:300;line-height:1.15;color:var(--charcoal);}
+.sec-h2{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,2.6vw,34px);font-weight:300;line-height:1.2;color:var(--charcoal);margin-bottom:18px;}
+.body-text{font-size:15px;font-weight:300;line-height:1.9;color:var(--mid);}
+.body-text strong{color:var(--charcoal);font-weight:500;}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:10.5px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--rose);margin-bottom:28px;}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--rose);flex-shrink:0;}
+.img-cover{width:100%;height:100%;object-fit:cover;display:block;}
+.img-frame{overflow:hidden;background:var(--light);}
+
+/* Banner */
+.banner{width:100%;background:var(--light);border-bottom:1px solid var(--border);padding:76px 52px;position:relative;}
+.banner::after{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--rose);}
+.banner-kicker{font-size:10.5px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--rose);margin-bottom:14px;}
+.banner-h{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,5vw,66px);font-weight:300;font-style:italic;color:var(--charcoal);line-height:1.1;max-width:700px;}
+.banner-sub{font-size:16px;font-weight:300;color:var(--mid);max-width:580px;margin-top:18px;line-height:1.85;}
+
+/* Buttons */
+.btn-fill{background:var(--rose-dark);color:#fff;padding:13px 30px;border-radius:2px;font-size:12px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;display:inline-block;cursor:pointer;border:none;transition:background .2s;}
+.btn-fill:hover{background:var(--rose);}
+.btn-outline{border:1px solid var(--border);color:var(--charcoal);padding:13px 30px;border-radius:2px;font-size:12px;font-weight:400;display:inline-block;cursor:pointer;background:transparent;transition:border-color .2s,color .2s;}
+.btn-outline:hover{border-color:var(--rose);color:var(--rose-deep);}
+.btn-rose-ol{border:1px solid var(--rose);color:var(--rose-deep);padding:13px 30px;border-radius:2px;font-size:12px;font-weight:400;display:inline-block;cursor:pointer;background:transparent;transition:background .2s,color .2s;}
+.btn-rose-ol:hover{background:var(--rose);color:#fff;}
+
+/* Form mockup */
+.form-mock{background:var(--white);border:1px solid var(--border);padding:28px;}
+.form-mock-label{font-size:10.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:6px;display:block;}
+.form-mock-input{width:100%;padding:10px 13px;border:1px solid var(--border);font-size:14px;font-weight:300;font-family:'DM Sans',sans-serif;color:var(--charcoal);background:var(--white);outline:none;margin-bottom:14px;transition:border-color .18s;}
+.form-mock-input:focus{border-color:var(--rose);}
+.form-mock-textarea{width:100%;padding:10px 13px;border:1px solid var(--border);font-size:14px;font-weight:300;font-family:'DM Sans',sans-serif;color:var(--charcoal);background:var(--white);outline:none;resize:vertical;min-height:110px;margin-bottom:14px;transition:border-color .18s;}
+.form-mock-textarea:focus{border-color:var(--rose);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* Footer */
+.site-footer{background:var(--charcoal);padding:44px 52px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px;}
+.footer-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:rgba(255,255,255,0.85);}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <div class="nav-logo" onclick="goTo('home')">
+    <svg width="40" height="42" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="a1"><path d="M0,0 L100,0 L100,60 Q100,65 106,65 Q112,65 112,71 Q112,77 106,77 Q100,77 100,82 L100,108 L58,108 Q58,114 52,114 Q46,114 46,120 Q46,126 52,126 Q58,126 58,132 L58,210 L0,210Z"/></clipPath>
+        <clipPath id="a2"><path d="M100,0 L200,0 L200,210 L142,210 Q142,126 148,126 Q154,126 154,120 Q154,114 148,114 Q142,114 142,108 L100,108 L100,82 Q100,77 94,77 Q88,77 88,71 Q88,65 94,65 Q100,65 100,60Z"/></clipPath>
+        <clipPath id="a3"><path d="M0,108 L58,108 Q58,114 52,114 Q46,114 46,120 Q46,126 52,126 Q58,126 58,132 L100,132 L100,155 Q100,160 94,160 Q88,160 88,166 Q88,172 94,172 Q100,172 100,177 L100,210 L0,210Z"/></clipPath>
+        <clipPath id="a4"><path d="M100,108 L142,108 Q142,114 148,114 Q154,114 154,120 Q154,126 148,126 Q142,126 142,132 L200,132 L200,210 L100,210 L100,177 Q100,172 94,172 Q88,172 88,166 Q88,160 94,160 Q100,160 100,155Z"/></clipPath>
+      </defs>
+      <path d="M38,8 C52,4 82,3 100,7 C120,11 155,14 168,32 C178,88 176,106 174,118 C178,128 181,136 176,146 C152,154 148,158 139,171 C120,171 100,168 80,177 C46,165 32,153 24,156 C13,163 6,144 8,128 C10,116 6,92 13,33 C16,19 30,12 38,8Z" fill="#C8737B" clip-path="url(#a1)"/>
+      <path d="M38,8 C52,4 82,3 100,7 C120,11 155,14 168,32 C178,88 176,106 174,118 C178,128 181,136 176,146 C152,154 148,158 139,171 C120,171 100,168 80,177 C46,165 32,153 24,156 C13,163 6,144 8,128 C10,116 6,92 13,33 C16,19 30,12 38,8Z" fill="#A04E58" clip-path="url(#a2)"/>
+      <path d="M38,8 C52,4 82,3 100,7 C120,11 155,14 168,32 C178,88 176,106 174,118 C178,128 181,136 176,146 C152,154 148,158 139,171 C120,171 100,168 80,177 C46,165 32,153 24,156 C13,163 6,144 8,128 C10,116 6,92 13,33 C16,19 30,12 38,8Z" fill="#E8A8AE" clip-path="url(#a3)"/>
+      <path d="M38,8 C52,4 82,3 100,7 C120,11 155,14 168,32 C178,88 176,106 174,118 C178,128 181,136 176,146 C152,154 148,158 139,171 C120,171 100,168 80,177 C46,165 32,153 24,156 C13,163 6,144 8,128 C10,116 6,92 13,33 C16,19 30,12 38,8Z" fill="#6D2E3A" clip-path="url(#a4)"/>
+      <line x1="100" y1="3" x2="100" y2="178" stroke="#fff" stroke-width="2"/>
+      <line x1="6" y1="108" x2="181" y2="108" stroke="#fff" stroke-width="2"/>
+      <circle cx="100" cy="108" r="2.5" fill="#fff"/>
+    </svg>
+    <div style="display:flex;flex-direction:column;">
+      <span class="nav-logo-name">Noelia Foundation</span>
+      <span class="nav-logo-sub">U.S. Nonprofit · Fairfax, VA · Serving Latin America</span>
+    </div>
+  </div>
+  <ul class="nav-links">
+    <li class="nav-li"><span class="nav-a" id="nav-home" onclick="goTo('home')">Home</span></li>
+    <li class="nav-li">
+      <span class="nav-a" id="nav-about" onclick="goTo('about')">About <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div class="nav-drop"><a onclick="goTo('about')">Our story &amp; founder<span class="nav-drop-sub">Osman Cuadros &amp; the Noelia mission</span></a><a onclick="goTo('about')">Governance &amp; transparency<span class="nav-drop-sub">501(c)(3), board, annual reporting</span></a></div>
+    </li>
+    <li class="nav-li">
+      <span class="nav-a" id="nav-programs" onclick="goTo('programs')">Programs <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div class="nav-drop"><a onclick="goTo('programs')">Therapeutic services<span class="nav-drop-sub">Speech &amp; developmental therapy</span></a><a onclick="goTo('programs')">Community centers &amp; resources<span class="nav-drop-sub">Santa Cruz center &amp; beyond</span></a><a onclick="goTo('programs')">Training &amp; capacity building<span class="nav-drop-sub">Train-the-trainer model</span></a></div>
+    </li>
+    <li class="nav-li">
+      <span class="nav-a" id="nav-impact" onclick="goTo('impact')">Impact <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div class="nav-drop"><a onclick="goTo('impact')">Stories &amp; outcomes<span class="nav-drop-sub">Real children, real change</span></a><a onclick="goTo('impact')">Build &amp; Grow Project<span class="nav-drop-sub">Santa Cruz community center</span></a></div>
+    </li>
+    <li class="nav-li">
+      <span class="nav-a" id="nav-give" onclick="goTo('give')">Give <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div class="nav-drop"><a onclick="goTo('give')">Corporate giving options<span class="nav-drop-sub">Sponsorships, in-kind donations</span></a><a onclick="goTo('give')">Become a corporate partner<span class="nav-drop-sub">Long-term mission alignment</span></a><a onclick="goTo('give')">What your support makes possible<span class="nav-drop-sub">$500 to $25,000+</span></a></div>
+    </li>
+    <li class="nav-li"><span class="nav-a" id="nav-contact" onclick="goTo('contact')">Contact</span></li>
+  </ul>
+  <span class="nav-cta" onclick="goTo('give')">Partner With Us</span>
+</nav>
+
+<!-- ══════════════════════════
+     HOME
+══════════════════════════ -->
+<div id="page-home" class="page active">
+
+  <!-- HERO: two columns, content-driven height, no fixed sizing -->
+  <section style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
+
+    <!-- Left: all text, padded, self-contained -->
+    <div style="padding:88px 52px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border);">
+      <div class="eyebrow">Fairfax, VA · U.S. 501(c)(3) · Serving Latin America</div>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(44px,5.2vw,66px);font-weight:300;line-height:1.1;color:var(--charcoal);margin-bottom:22px;">Live with <em style="font-style:italic;color:var(--rose-deep);">Hope.</em></h1>
+      <p style="font-size:16px;font-weight:300;line-height:1.85;color:var(--mid);max-width:440px;margin-bottom:40px;">Too often, children with disabilities are left behind. Noelia Foundation exists to change that — delivering essential services, connecting families to resources, and building a global network of experts across Latin America.</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <span class="btn-fill" onclick="goTo('give')">Explore Giving</span>
+        <span class="btn-outline" onclick="goTo('about')">Our Mission →</span>
+      </div>
+      <!-- Stats row, separated cleanly -->
+      <div style="display:flex;gap:0;margin-top:52px;padding-top:36px;border-top:1px solid var(--border);">
+        <div style="flex:1;padding-right:24px;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--rose-dark);line-height:1;">19M+</div>
+          <div style="font-size:10.5px;font-weight:400;color:var(--mid);letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">People with disabilities in Latin America</div>
+        </div>
+        <div style="flex:1;padding:0 24px;border-left:1px solid var(--border);">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--rose-dark);line-height:1;">2019</div>
+          <div style="font-size:10.5px;font-weight:400;color:var(--mid);letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">Actively serving since</div>
+        </div>
+        <div style="flex:1;padding-left:24px;border-left:1px solid var(--border);">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--rose-dark);line-height:1;">3</div>
+          <div style="font-size:10.5px;font-weight:400;color:var(--mid);letter-spacing:0.06em;text-transform:uppercase;margin-top:6px;">Core programs</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: image only, stretches to match left height -->
+    <div style="position:relative;overflow:hidden;min-height:480px;">
+      <img style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?w=900&q=80&fit=crop" alt="Child receiving therapy support">
+      <div style="position:absolute;inset:0;background:rgba(30,28,27,0.15);"></div>
+      <!-- Floating badge -->
+      <div style="position:absolute;bottom:28px;left:20px;background:var(--white);border:1px solid var(--border);padding:13px 17px;display:flex;align-items:center;gap:11px;z-index:2;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;"></div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--charcoal);">Active across Bolivia</div>
+          <div style="font-size:11px;color:var(--mid);margin-top:1px;">Education · Therapy · Outreach</div>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--rose);z-index:2;"></div>
+    </div>
+  </section>
+
+  <!-- Challenges -->
+  <section style="padding:88px 52px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start;">
+    <div>
+      <div class="sec-label">The Challenges Families Face</div>
+      <h2 class="sec-h" style="margin-bottom:26px;">Too often, children with disabilities are left behind.</h2>
+      <p class="body-text" style="margin-bottom:18px;">In regions like Bolivia, families often face this challenge alone, without the resources they need to support their loved ones. Children and adults with disabilities face numerous barriers in education, healthcare, essential services, social exclusion, and career opportunities.</p>
+      <p class="body-text" style="margin-bottom:30px;">Noelia Foundation is headquartered in Fairfax, VA with active programs across Latin America, where over 19 million people live with disabilities and access to care remains critically limited.</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <span class="btn-fill" onclick="goTo('programs')">Our Programs</span>
+        <span class="btn-outline" onclick="goTo('about')">Learn More</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="img-frame" style="height:210px;"><img class="img-cover" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&fit=crop" alt="Family supporting child with disability"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="img-frame" style="height:148px;"><img class="img-cover" src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=500&q=80&fit=crop" alt="Community gathering"></div>
+        <div class="img-frame" style="height:148px;"><img class="img-cover" src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=500&q=80&fit=crop" alt="Child learning with support"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How Noelia Steps In -->
+  <section style="padding:88px 52px;border-bottom:1px solid var(--border);background:var(--light);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;">
+      <div>
+        <div class="sec-label">How Noelia Steps In</div>
+        <h2 class="sec-h" style="margin-bottom:26px;">From isolation to opportunity.</h2>
+        <p class="body-text" style="margin-bottom:18px;">Noelia is a U.S.-based 501(c)(3) nonprofit dedicated to supporting disadvantaged communities throughout Latin America. By delivering essential services, connecting families to critical resources, and advocating for inclusion, we help children and young adults with disabilities move from isolation to opportunity.</p>
+        <p class="body-text" style="margin-bottom:18px;">Intentionally designed to scale at a global level, our vast network includes experts in healthcare, education, and advocacy. As our network continues to grow, so does our impact.</p>
+        <p class="body-text" style="margin-bottom:30px;"><strong>Your support makes this possible</strong> — turning barriers into breakthroughs, and need into hope.</p>
+        <span class="btn-fill" onclick="goTo('impact')">See Our Impact</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);">
+        <div class="img-frame" style="height:210px;"><img class="img-cover" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&q=80&fit=crop" alt="Therapy session"></div>
+        <div class="img-frame" style="height:210px;"><img class="img-cover" src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&q=80&fit=crop" alt="Community program"></div>
+        <div class="img-frame" style="height:210px;"><img class="img-cover" src="https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=500&q=80&fit=crop" alt="Child with caregiver"></div>
+        <div class="img-frame" style="height:210px;"><img class="img-cover" src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=500&q=80&fit=crop" alt="Training"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- US credibility band -->
+  <section style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border);">
+    <div style="background:var(--white);padding:36px 28px;text-align:center;">
+      <div style="font-size:10.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);margin-bottom:10px;">Registered</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--charcoal);">501(c)(3)</div>
+      <div style="font-size:13px;color:var(--mid);margin-top:6px;line-height:1.5;">All gifts are fully tax-deductible</div>
+    </div>
+    <div style="background:var(--white);padding:36px 28px;text-align:center;">
+      <div style="font-size:10.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);margin-bottom:10px;">Headquartered</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--charcoal);">Fairfax, VA</div>
+      <div style="font-size:13px;color:var(--mid);margin-top:6px;line-height:1.5;">With in-country operations in Santa Cruz, Bolivia</div>
+    </div>
+    <div style="background:var(--white);padding:36px 28px;text-align:center;">
+      <div style="font-size:10.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);margin-bottom:10px;">Accountability</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--charcoal);">94% to Programs</div>
+      <div style="font-size:13px;color:var(--mid);margin-top:6px;line-height:1.5;">94¢ of every dollar reaches children directly</div>
+    </div>
+    <div style="background:var(--white);padding:36px 28px;text-align:center;">
+      <div style="font-size:10.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);margin-bottom:10px;">Serving since</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--charcoal);">2019</div>
+      <div style="font-size:13px;color:var(--mid);margin-top:6px;line-height:1.5;">Corporate partners &amp; foundations since day one</div>
+    </div>
+  </section>
+
+  <!-- Giving CTA -->
+  <section style="padding:88px 52px;border-bottom:1px solid var(--border);text-align:center;">
+    <div class="sec-label" style="justify-content:center;">Interested in Giving?</div>
+    <h2 class="sec-h" style="max-width:500px;margin:0 auto 18px;">Explore our donation options.</h2>
+    <p class="body-text" style="max-width:460px;margin:0 auto;">As a U.S.-based 501(c)(3), all contributions to Noelia Foundation are fully tax-deductible. For specific questions about giving and donations, contact us directly.</p>
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:34px;flex-wrap:wrap;">
+      <span class="btn-fill" onclick="goTo('give')">Learn about Corporate Giving</span>
+      <span class="btn-outline" onclick="goTo('contact')">Contact Us</span>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════
+     ABOUT
+══════════════════════════ -->
+<div id="page-about" class="page">
+  <div class="banner">
+    <div class="banner-kicker">Our Promise to You</div>
+    <h1 class="banner-h">Our Story</h1>
+    <p class="banner-sub">At Noelia, our mission goes beyond addressing immediate needs — we are working to transform what is possible for children and young adults with disabilities and the families who support them.</p>
+  </div>
+
+  <!-- Founder story -->
+  <section style="padding:88px 52px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1.1fr 1fr;gap:72px;align-items:start;">
+    <div>
+      <div class="sec-label">Founder's Story</div>
+      <h2 class="sec-h" style="margin-bottom:26px;">Founded on personal experience. Built for lasting change.</h2>
+      <p class="body-text" style="margin-bottom:18px;">Osman Cuadros, founder of Noelia, established the organization to give back to children, young adults, and families who need support most. As a father of a child with a disability, Osman has a deeply personal understanding of the daily challenges these families face.</p>
+      <p class="body-text" style="margin-bottom:18px;">Noelia is more than a nonprofit — it is a lifeline, providing access to critical support systems that uplift and empower communities across Latin America.</p>
+      <p class="body-text" style="margin-bottom:30px;">Noelia Foundation is a registered U.S. 501(c)(3) nonprofit, headquartered in Fairfax, VA, and governed by a dedicated board of directors committed to financial transparency, responsible stewardship, and scalable impact.</p>
+      <span class="btn-fill" onclick="goTo('give')">Support Our Mission</span>
+    </div>
+    <div class="img-frame" style="height:460px;">
+      <img class="img-cover" src="https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=700&q=80&fit=crop" alt="Child receiving one-on-one care">
+    </div>
+  </section>
+
+  <!-- Three pillars -->
+  <section style="padding:88px 52px;border-bottom:1px solid var(--border);">
+    <div class="sec-label">Mission in Action</div>
+    <h2 class="sec-h" style="max-width:540px;margin-bottom:0;">Three pillars that drive everything we do.</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:52px;">
+      <div style="background:var(--white);padding:42px 34px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--rose);letter-spacing:0.1em;margin-bottom:18px;">01 — Access</div>
+        <h3 style="font-size:17px;font-weight:500;color:var(--charcoal);margin-bottom:12px;">Expanding Access to Essential Services</h3>
+        <p style="font-size:15px;font-weight:300;line-height:1.9;color:var(--mid);">We provide and strengthen access to critical therapies, including speech and developmental support, ensuring that children and young adults receive the care they need to communicate and learn. Early and consistent intervention unlocks each child's potential.</p>
+      </div>
+      <div style="background:var(--white);padding:42px 34px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--rose);letter-spacing:0.1em;margin-bottom:18px;">02 — Capacity</div>
+        <h3 style="font-size:17px;font-weight:500;color:var(--charcoal);margin-bottom:12px;">Building Local Capacity Through Training</h3>
+        <p style="font-size:15px;font-weight:300;line-height:1.9;color:var(--mid);">Sustainable impact requires local expertise. Noelia invests in training professionals and community members through a "train-the-trainer" model, equipping educators, caregivers, and service providers with the skills needed to support children and young adults with disabilities.</p>
+      </div>
+      <div style="background:var(--white);padding:42px 34px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--rose);letter-spacing:0.1em;margin-bottom:18px;">03 — Community</div>
+        <h3 style="font-size:17px;font-weight:500;color:var(--charcoal);margin-bottom:12px;">Connecting Families to Community Centers &amp; Resources</h3>
+        <p style="font-size:15px;font-weight:300;line-height:1.9;color:var(--mid);">Families are at the heart of everything we do. We connect them with vital support systems, resources, and community centers with therapeutic services — creating a more inclusive and supportive environment for a better quality of life.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- US Org section -->
+  <section style="padding:88px 52px;border-bottom:1px solid var(--border);background:var(--light);display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;">
+    <div>
+      <div class="sec-label">About Our Organization</div>
+      <h2 class="sec-h" style="margin-bottom:26px;">A U.S. nonprofit. A Latin American mission.</h2>
+      <p class="body-text" style="margin-bottom:18px;">Noelia Foundation is a United States-based 501(c)(3) nonprofit headquartered in Fairfax, VA, governed by a U.S. board of directors committed to financial transparency and scalable impact.</p>
+      <p class="body-text" style="margin-bottom:18px;">Our operational team works on the ground in Santa Cruz, Bolivia, with a roadmap for expansion across underserved communities throughout Latin America.</p>
+      <p class="body-text" style="margin-bottom:30px;">Intentionally designed to scale at a global level, our network includes experts in healthcare, education, and advocacy — growing our impact with every new partnership.</p>
+      <span class="btn-fill" onclick="goTo('give')">Make a Tax-Deductible Gift</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);">
+      <div style="background:var(--white);padding:38px 30px;text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:var(--rose-dark);line-height:1;">94%</div><div style="font-size:13px;color:var(--mid);margin-top:10px;line-height:1.5;">funds directly to programs</div></div>
+      <div style="background:var(--white);padding:38px 30px;text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:var(--rose-dark);line-height:1;">2019</div><div style="font-size:13px;color:var(--mid);margin-top:10px;line-height:1.5;">actively serving since</div></div>
+      <div style="background:var(--white);padding:38px 30px;text-align:center;border-top:1px solid var(--border);"><div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:var(--rose-dark);line-height:1;">3</div><div style="font-size:13px;color:var(--mid);margin-top:10px;line-height:1.5;">core programs in operation</div></div>
+      <div style="background:var(--white);padding:38px 30px;text-align:center;border-top:1px solid var(--border);"><div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:var(--rose-dark);line-height:1;">501c3</div><div style="font-size:13px;color:var(--mid);margin-top:10px;line-height:1.5;">all gifts tax-deductible</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════
+     PROGRAMS
+══════════════════════════ -->
+<div id="page-programs" class="page">
+  <div class="banner">
+    <div class="banner-kicker">Our Programs</div>
+    <h1 class="banner-h">Where care meets community.</h1>
+    <p class="banner-sub">At Noelia, our programs are designed to meet children with disabilities and their families where they are — providing essential care, building local capacity, and creating pathways to long-term inclusion. Explore our three programs: Therapeutic Services, Community Centers and Resource Support, and our Training and Capacity Building Program.</p>
+  </div>
+
+  <!-- Program 1 -->
+  <section style="padding:80px 52px;border-bottom:1px solid var(--border);background:var(--white);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;">
+      <div>
+        <div style="display:inline-block;font-size:9.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose-deep);background:var(--blush);padding:4px 10px;margin-bottom:20px;">Program 01 — Therapeutic Services</div>
+        <h2 class="sec-h2">Therapeutic Services</h2>
+        <p class="body-text" style="margin-bottom:18px;">Access to consistent, high-quality therapy can change the trajectory of a child — but for many families, it remains out of reach.</p>
+        <p class="body-text" style="margin-bottom:18px;">Noelia brings speech and developmental therapies to the communities that need them most. These services focus on improving communication, motor skills, and cognitive development, helping children gain independence and confidence over time.</p>
+        <p class="body-text" style="margin-bottom:30px;">By prioritizing early and ongoing intervention, we support meaningful progress that extends far beyond the therapy setting and into everyday life.</p>
+        <span class="btn-rose-ol" onclick="goTo('contact')">Learn More →</span>
+      </div>
+      <div class="img-frame" style="height:440px;"><img class="img-cover" src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=700&q=80&fit=crop" alt="Speech therapy session with a child"></div>
+    </div>
+  </section>
+
+  <!-- Program 2 -->
+  <section style="padding:80px 52px;border-bottom:1px solid var(--border);background:var(--light);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;direction:rtl;">
+      <div style="direction:ltr;">
+        <div style="display:inline-block;font-size:9.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose-deep);background:var(--blush);padding:4px 10px;margin-bottom:20px;">Program 02 — Community Centers &amp; Resource Support</div>
+        <h2 class="sec-h2">Community Centers &amp; Resource Support</h2>
+        <p class="body-text" style="margin-bottom:18px;">Families often face overwhelming barriers when trying to access care, education, and basic support systems for loved ones with disabilities. Noelia specializes in building, remodeling, and staffing community centers with various therapeutic services to help bridge that gap.</p>
+        <p class="body-text" style="margin-bottom:18px;">Currently, Noelia operates a community center in Santa Cruz, Bolivia, with a roadmap for replication of similar centers across underserved communities in Latin America as our partner network and funding capacity grow.</p>
+        <p class="body-text" style="margin-bottom:18px;">In tandem with our community centers, we leverage local grassroots initiatives to connect families to essential services, guidance, and support networks. From navigating healthcare systems to accessing educational opportunities, we help families find the tools they need to advocate for their children.</p>
+        <p style="font-size:13px;font-style:italic;color:var(--mid);margin-bottom:30px;">Details on the Santa Cruz center — size, people supported, in-house expertise, and founding date — coming soon.</p>
+        <span class="btn-rose-ol" onclick="goTo('contact')">Learn More →</span>
+      </div>
+      <div class="img-frame" style="height:440px;direction:ltr;"><img class="img-cover" src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=700&q=80&fit=crop" alt="Community resource support for families"></div>
+    </div>
+  </section>
+
+  <!-- Program 3 -->
+  <section style="padding:80px 52px;border-bottom:1px solid var(--border);background:var(--white);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;">
+      <div>
+        <div style="display:inline-block;font-size:9.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose-deep);background:var(--blush);padding:4px 10px;margin-bottom:20px;">Program 03 — Training &amp; Capacity Building</div>
+        <h2 class="sec-h2">Training &amp; Capacity Building</h2>
+        <p class="body-text" style="margin-bottom:18px;">Through our "train-the-trainer" model, Noelia equips educators, healthcare providers, and community leaders with the skills and knowledge needed to support children with disabilities.</p>
+        <p class="body-text" style="margin-bottom:30px;">By investing in local professionals, we expand the reach of care and ensure that support continues long after direct services are delivered. Sustainable impact requires local expertise — and that's exactly what we build.</p>
+        <span class="btn-rose-ol" onclick="goTo('contact')">Learn More →</span>
+      </div>
+      <div class="img-frame" style="height:440px;"><img class="img-cover" src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=700&q=80&fit=crop" alt="Training and capacity building workshop"></div>
+    </div>
+  </section>
+
+  <section style="padding:80px 52px;background:var(--light);text-align:center;">
+    <div class="sec-label" style="justify-content:center;">Ready to Support Our Programs?</div>
+    <h2 class="sec-h" style="max-width:500px;margin:0 auto 22px;">Your partnership makes this work possible.</h2>
+    <p class="body-text" style="max-width:460px;margin:0 auto 34px;">As a U.S.-based 501(c)(3), all contributions are fully tax-deductible. Explore how your organization can create lasting change for children with disabilities across Latin America.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <span class="btn-fill" onclick="goTo('give')">Corporate Giving Options</span>
+      <span class="btn-outline" onclick="goTo('contact')">Contact Us</span>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════
+     IMPACT
+══════════════════════════ -->
+<div id="page-impact" class="page">
+
+  <!-- Full-width banner image -->
+  <div style="position:relative;height:400px;overflow:hidden;border-bottom:1px solid var(--border);">
+    <img style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1400&q=80&fit=crop" alt="Children in Bolivia">
+    <div style="position:absolute;inset:0;background:rgba(30,20,20,0.52);"></div>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:64px 52px;">
+      <div style="font-size:10.5px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--rose);margin-bottom:16px;">Live with Hope</div>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(38px,5vw,64px);font-weight:300;font-style:italic;color:#fff;line-height:1.1;max-width:640px;">Every child. Every family. Every community.</h1>
+      <p style="font-size:16px;font-weight:300;color:rgba(255,255,255,0.78);max-width:560px;margin-top:18px;line-height:1.85;">Through Noelia's programs, children gain critical skills, families gain support, and communities become better equipped to champion every child and young adult. Our end goal is for every child, adult, and family to live with hope.</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <section style="padding:80px 52px;border-bottom:1px solid var(--border);background:var(--light);">
+    <div class="sec-label">By the Numbers</div>
+    <h2 class="sec-h" style="margin-bottom:0;">The reach of our work.</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);margin-top:48px;">
+      <div style="background:var(--white);padding:44px 28px;text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:50px;font-weight:300;line-height:1;color:var(--rose-dark);">2019</div><div style="width:32px;height:3px;background:var(--rose);margin:18px auto;"></div><div style="font-size:13px;font-weight:300;color:var(--mid);line-height:1.5;">Actively serving children &amp; families</div></div>
+      <div style="background:var(--white);padding:44px 28px;text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:50px;font-weight:300;line-height:1;color:var(--rose-dark);">19M+</div><div style="width:32px;height:3px;background:var(--rose);margin:18px auto;"></div><div style="font-size:13px;font-weight:300;color:var(--mid);line-height:1.5;">People with disabilities in Latin America we work to reach</div></div>
+      <div style="background:var(--white);padding:44px 28px;text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:50px;font-weight:300;line-height:1;color:var(--rose-dark);">1</div><div style="width:32px;height:3px;background:var(--rose);margin:18px auto;"></div><div style="font-size:13px;font-weight:300;color:var(--mid);line-height:1.5;">Active community center in Santa Cruz, Bolivia</div></div>
+      <div style="background:var(--white);padding:44px 28px;text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:50px;font-weight:300;line-height:1;color:var(--rose-dark);">3</div><div style="width:32px;height:3px;background:var(--rose);margin:18px auto;"></div><div style="font-size:13px;font-weight:300;color:var(--mid);line-height:1.5;">Core programs delivering direct impact</div></div>
+    </div>
+  </section>
+
+  <!-- Stories -->
+  <section style="padding:80px 52px;border-bottom:1px solid var(--border);">
+    <div class="sec-label">Stories of Impact</div>
+    <h2 class="sec-h" style="margin-bottom:0;">Real children. Real change.</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:48px;">
+      <div style="background:var(--white);overflow:hidden;">
+        <div style="height:230px;overflow:hidden;"><img class="img-cover" src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=600&q=80&fit=crop" alt="Sofia"></div>
+        <div style="padding:30px;">
+          <div style="font-size:9.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span style="width:16px;height:1px;background:var(--rose);display:inline-block;"></span>Education · Santa Cruz</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:var(--charcoal);margin-bottom:10px;">Sofia, age 7</div>
+          <p style="font-size:14px;font-weight:300;line-height:1.9;color:var(--mid);">When Sofia arrived at our center, she hadn't spoken a word. Today, she reads aloud to her classmates and is learning to write her name.<br><br><em style="color:var(--rose-deep);font-family:'Cormorant Garamond',serif;font-size:16px;">"She laughs now. Every single day, she laughs." — Sofia's mother</em></p>
+        </div>
+      </div>
+      <div style="background:var(--white);overflow:hidden;">
+        <div style="height:230px;overflow:hidden;"><img class="img-cover" src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&q=80&fit=crop" alt="Miguel"></div>
+        <div style="padding:30px;">
+          <div style="font-size:9.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span style="width:16px;height:1px;background:var(--rose);display:inline-block;"></span>Therapy · Cochabamba</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:var(--charcoal);margin-bottom:10px;">Miguel, age 11</div>
+          <p style="font-size:14px;font-weight:300;line-height:1.9;color:var(--mid);">Miguel has cerebral palsy. Through six months of dedicated physical therapy, he took his first independent steps. His goal is to walk to school on his own.<br><br><em style="color:var(--rose-deep);font-family:'Cormorant Garamond',serif;font-size:16px;">"I didn't know help like this existed." — Miguel's father</em></p>
+        </div>
+      </div>
+      <div style="background:var(--white);overflow:hidden;">
+        <div style="height:230px;overflow:hidden;"><img class="img-cover" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&q=80&fit=crop" alt="Valentina"></div>
+        <div style="padding:30px;">
+          <div style="font-size:9.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span style="width:16px;height:1px;background:var(--rose);display:inline-block;"></span>Outreach · Beni Region</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:var(--charcoal);margin-bottom:10px;">Valentina's Family</div>
+          <p style="font-size:14px;font-weight:300;line-height:1.9;color:var(--mid);">Valentina lives four hours by boat from the nearest road. Today she has an individualized education plan — the first child in her village to have one.<br><br><em style="color:var(--rose-deep);font-family:'Cormorant Garamond',serif;font-size:16px;">"We never thought anyone would come all the way out here." — Community elder</em></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Build and Grow -->
+  <section style="padding:80px 52px;border-bottom:1px solid var(--border);">
+    <div class="sec-label">Live Projects</div>
+    <h2 class="sec-h" style="margin-bottom:18px;">Build and Grow Project</h2>
+    <p class="body-text" style="max-width:720px;margin-bottom:52px;">Noelia is excited to continue our Build and Grow Project. Falling under our Community Centers and Resource Support Program, we have built our first therapeutic community center for children and young adults with disabilities in Santa Cruz, Bolivia. Our goal is to build, remodel, and staff many more community centers dedicated to children and young adults with disabilities throughout Latin America.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);">
+      <div class="img-frame" style="height:250px;"><img class="img-cover" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80&fit=crop" alt="Community center"></div>
+      <div class="img-frame" style="height:250px;"><img class="img-cover" src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=700&q=80&fit=crop" alt="School renovation"></div>
+      <div class="img-frame" style="height:250px;"><img class="img-cover" src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=700&q=80&fit=crop" alt="Children in center"></div>
+    </div>
+  </section>
+
+  <section style="padding:80px 52px;background:var(--light);text-align:center;">
+    <div class="sec-label" style="justify-content:center;">Make an Impact Today</div>
+    <h2 class="sec-h" style="max-width:540px;margin:0 auto 22px;">Our goal is for every child, adult, and family to live with hope.</h2>
+    <div style="display:flex;gap:14px;justify-content:center;margin-top:34px;flex-wrap:wrap;">
+      <span class="btn-fill" onclick="goTo('give')">Donate Now</span>
+      <span class="btn-outline" onclick="goTo('give')">Corporate Giving</span>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════
+     GIVE
+══════════════════════════ -->
+<div id="page-give" class="page">
+
+  <!-- Banner -->
+  <div style="position:relative;height:320px;overflow:hidden;border-bottom:1px solid var(--border);">
+    <img style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" src="https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1400&q=80&fit=crop" alt="Supporting children with disabilities">
+    <div style="position:absolute;inset:0;background:rgba(109,46,58,0.65);"></div>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:52px;">
+      <div style="font-size:10.5px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:rgba(240,184,191,0.85);margin-bottom:16px;">Giving Options</div>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4vw,52px);font-weight:300;font-style:italic;color:#fff;line-height:1.15;max-width:640px;">Noelia has been actively serving children and families since 2019, supported by the generosity of corporate partners and foundations.</h1>
+      <p style="font-size:15px;font-weight:300;color:rgba(255,255,255,0.75);margin-top:14px;">As a U.S.-registered 501(c)(3), all donations are fully tax-deductible.</p>
+    </div>
+  </div>
+
+  <!-- Two giving paths -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);">
+    <div style="background:var(--white);padding:56px 48px;border-bottom:1px solid var(--border);">
+      <div style="font-size:9.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--rose);margin-bottom:14px;">Option 01</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--charcoal);margin-bottom:18px;">Corporate Giving Options</div>
+      <p style="font-size:15px;font-weight:300;line-height:1.9;color:var(--mid);margin-bottom:30px;">Support Noelia through financial contributions, program sponsorships, or in-kind donations that directly fund services for children with disabilities and their families. All corporate gifts are fully tax-deductible.</p>
+      <span class="btn-fill">Donate Now ↓</span>
+    </div>
+    <div style="background:var(--white);padding:56px 48px;border-bottom:1px solid var(--border);">
+      <div style="font-size:9.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--rose);margin-bottom:14px;">Option 02</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--charcoal);margin-bottom:18px;">Become a Corporate Partner</div>
+      <p style="font-size:15px;font-weight:300;line-height:1.9;color:var(--mid);margin-bottom:30px;">Partner with Noelia to create meaningful, long-term impact through customized collaborations that align your company's values with our mission. We encourage corporate partners, foundations, and high-net-worth families to explore our giving options.</p>
+      <span class="btn-outline" onclick="goTo('contact')">Become a Partner →</span>
+    </div>
+  </div>
+
+  <!-- What your support makes possible -->
+  <section style="padding:80px 52px;border-bottom:1px solid var(--border);background:var(--light);">
+    <div class="sec-label">What Your Support Makes Possible</div>
+    <h2 class="sec-h" style="margin-bottom:10px;">Every dollar goes further in Latin America.</h2>
+    <p class="body-text" style="margin-bottom:48px;max-width:600px;">All figures reflect program costs in Latin America — your gift stretches farther here than almost anywhere else in the world.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);">
+      <div style="background:var(--white);padding:38px 28px;position:relative;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:transparent;transition:background .2s;" class="give-top-stripe"></div>
+        <div style="display:inline-block;font-size:9.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose-deep);background:var(--blush);padding:3px 9px;margin-bottom:14px;">Starter</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--rose-dark);line-height:1;margin-bottom:12px;">$500</div>
+        <p style="font-size:14px;font-weight:300;line-height:1.7;color:var(--mid);">One month of specialist therapy services on-site</p>
+      </div>
+      <div style="background:var(--white);padding:38px 28px;">
+        <div style="display:inline-block;font-size:9.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose-deep);background:var(--blush);padding:3px 9px;margin-bottom:14px;">Impact</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--rose-dark);line-height:1;margin-bottom:12px;">$2,500</div>
+        <p style="font-size:14px;font-weight:300;line-height:1.7;color:var(--mid);">Classroom materials and adaptive tools for a full year</p>
+      </div>
+      <div style="background:var(--white);padding:38px 28px;">
+        <div style="display:inline-block;font-size:9.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose-deep);background:var(--blush);padding:3px 9px;margin-bottom:14px;">Transformational</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--rose-dark);line-height:1;margin-bottom:12px;">$10,000</div>
+        <p style="font-size:14px;font-weight:300;line-height:1.7;color:var(--mid);">Complete community center renovation</p>
+      </div>
+      <div style="background:var(--white);padding:38px 28px;">
+        <div style="display:inline-block;font-size:9.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose-deep);background:var(--blush);padding:3px 9px;margin-bottom:14px;">Legacy</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--rose-dark);line-height:1;margin-bottom:12px;">$25,000+</div>
+        <p style="font-size:14px;font-weight:300;line-height:1.7;color:var(--mid);">Multi-program sponsorship at a partner center</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Donate form placeholder + Partner form placeholder -->
+  <section style="padding:80px 52px;border-bottom:1px solid var(--border);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;">
+      <div>
+        <div class="sec-label">Donate Now</div>
+        <h2 class="sec-h2">Make a tax-deductible gift.</h2>
+        <p class="body-text" style="margin-bottom:28px;">Use the form below to make a secure contribution. All donations are processed through our U.S.-registered 501(c)(3) and are fully tax-deductible.</p>
+        <div class="form-mock">
+          <div class="form-row" style="margin-bottom:0;">
+            <div><label class="form-mock-label">First name</label><input class="form-mock-input" type="text" placeholder="Maria"></div>
+            <div><label class="form-mock-label">Last name</label><input class="form-mock-input" type="text" placeholder="Rodriguez"></div>
+          </div>
+          <label class="form-mock-label">Email</label><input class="form-mock-input" type="email" placeholder="maria@company.com">
+          <label class="form-mock-label">Donation amount</label>
+          <select class="form-mock-input"><option>$500 — Specialist therapy services</option><option>$2,500 — Classroom materials, full year</option><option>$10,000 — Community center renovation</option><option>$25,000+ — Multi-program sponsorship</option><option>Custom amount</option></select>
+          <label class="form-mock-label">Message (optional)</label><textarea class="form-mock-textarea" placeholder="Any notes or dedication..."></textarea>
+          <span class="btn-fill" style="width:100%;text-align:center;display:block;">Donate Now</span>
+        </div>
+      </div>
+      <div>
+        <div class="sec-label">Become a Partner</div>
+        <h2 class="sec-h2">Start a partnership conversation.</h2>
+        <p class="body-text" style="margin-bottom:28px;">Tell us about your organization and how you'd like to collaborate. We'll be in touch to design a partnership that aligns your values with our mission.</p>
+        <div class="form-mock">
+          <div class="form-row" style="margin-bottom:0;">
+            <div><label class="form-mock-label">First name</label><input class="form-mock-input" type="text" placeholder="John"></div>
+            <div><label class="form-mock-label">Last name</label><input class="form-mock-input" type="text" placeholder="Smith"></div>
+          </div>
+          <label class="form-mock-label">Organization</label><input class="form-mock-input" type="text" placeholder="Company or foundation name">
+          <label class="form-mock-label">Email</label><input class="form-mock-input" type="email" placeholder="john@company.com">
+          <label class="form-mock-label">Partnership interest</label>
+          <select class="form-mock-input"><option>Corporate financial contribution</option><option>Program sponsorship</option><option>In-kind donation</option><option>Foundation grant</option><option>High-net-worth family giving</option></select>
+          <label class="form-mock-label">Tell us about your goals</label><textarea class="form-mock-textarea" placeholder="How would you like to create impact?"></textarea>
+          <span class="btn-fill" style="width:100%;text-align:center;display:block;">Become a Partner</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════
+     CONTACT
+══════════════════════════ -->
+<div id="page-contact" class="page">
+  <div class="banner">
+    <div class="banner-kicker">Get in Touch</div>
+    <h1 class="banner-h">Ready to give? Contact us.</h1>
+    <p class="banner-sub">Whether you're a U.S. corporation exploring partnership, an individual donor, or a family seeking resources — our team is ready to connect.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
+
+    <!-- Left: form -->
+    <div style="padding:80px 52px;border-right:1px solid var(--border);">
+      <div class="sec-label">Send a Message</div>
+      <h2 class="sec-h" style="margin-bottom:10px;">General Inquiry</h2>
+      <p class="body-text" style="margin-bottom:30px;">For questions about our programs, tax-deductible donations, or partnership opportunities.</p>
+      <div class="form-mock">
+        <div class="form-row" style="margin-bottom:0;">
+          <div><label class="form-mock-label">First name</label><input class="form-mock-input" type="text" placeholder="Maria"></div>
+          <div><label class="form-mock-label">Last name</label><input class="form-mock-input" type="text" placeholder="Rodriguez"></div>
+        </div>
+        <label class="form-mock-label">Email</label><input class="form-mock-input" type="email" placeholder="maria@company.com">
+        <label class="form-mock-label">Organization (optional)</label><input class="form-mock-input" type="text" placeholder="Company or organization name">
+        <label class="form-mock-label">I am interested in</label>
+        <select class="form-mock-input"><option>Corporate partnership</option><option>Tax-deductible individual giving</option><option>Learning about programs</option><option>Media / press inquiry</option><option>Other</option></select>
+        <label class="form-mock-label">Message</label><textarea class="form-mock-textarea" placeholder="Tell us how we can help..."></textarea>
+        <span class="btn-fill" style="display:inline-block;">Send Message</span>
+      </div>
+    </div>
+
+    <!-- Right: contact info -->
+    <div style="padding:80px 52px;background:var(--light);">
+      <div class="sec-label">Contact Information</div>
+      <h2 class="sec-h" style="margin-bottom:10px;">Let's connect.</h2>
+      <p class="body-text" style="margin-bottom:34px;">Reach us directly for partnership inquiries, donation questions, or to learn more about our work across Latin America.</p>
+
+      <div class="img-frame" style="height:220px;margin-bottom:36px;">
+        <img class="img-cover" src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=700&q=80&fit=crop" alt="Noelia team with families">
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:28px;">
+        <div>
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose);margin-bottom:7px;">Email</div>
+          <div style="font-size:15px;font-weight:300;color:var(--charcoal);">info@noeliafoundation.org</div>
+          <div style="font-size:13.5px;color:var(--mid);margin-top:3px;">General inquiries &amp; program questions</div>
+        </div>
+        <div>
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose);margin-bottom:7px;">Partnerships</div>
+          <div style="font-size:15px;font-weight:300;color:var(--charcoal);">partners@noeliafoundation.org</div>
+          <div style="font-size:13.5px;color:var(--mid);margin-top:3px;">Corporate giving &amp; major gift conversations</div>
+        </div>
+        <div>
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose);margin-bottom:7px;">Phone</div>
+          <div style="font-size:15px;font-weight:300;color:var(--charcoal);">[Phone number]</div>
+          <div style="font-size:13.5px;color:var(--mid);margin-top:3px;">Available Monday–Friday, 9am–5pm ET</div>
+        </div>
+        <div>
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose);margin-bottom:7px;">Mailing Address</div>
+          <div style="font-size:15px;font-weight:300;color:var(--charcoal);line-height:1.6;">Noelia Foundation<br>[Street Address]<br>Fairfax, VA [ZIP]</div>
+        </div>
+        <div>
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--rose);margin-bottom:7px;">Legal &amp; Tax</div>
+          <div style="font-size:15px;font-weight:300;color:var(--charcoal);">501(c)(3) Nonprofit · EIN: XX-XXXXXXX</div>
+          <div style="font-size:13.5px;color:var(--mid);margin-top:3px;">U.S.-registered · All donations fully tax-deductible</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="site-footer">
+  <div style="display:flex;align-items:center;gap:11px;">
+    <svg width="26" height="28" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+      <defs><clipPath id="f1"><path d="M0,0 L100,0 L100,60 Q100,65 106,65 Q112,65 112,71 Q112,77 106,77 Q100,77 100,82 L100,108 L58,108 Q58,114 52,114 Q46,114 46,120 Q46,126 52,126 Q58,126 58,132 L58,210 L0,210Z"/></clipPath><clipPath id="f2"><path d="M100,0 L200,0 L200,210 L142,210 Q142,126 148,126 Q154,126 154,120 Q154,114 148,114 Q142,114 142,108 L100,108 L100,82 Q100,77 94,77 Q88,77 88,71 Q88,65 94,65 Q100,65 100,60Z"/></clipPath><clipPath id="f3"><path d="M0,108 L58,108 Q58,114 52,114 Q46,114 46,120 Q46,126 52,126 Q58,126 58,132 L100,132 L100,155 Q100,160 94,160 Q88,160 88,166 Q88,172 94,172 Q100,172 100,177 L100,210 L0,210Z"/></clipPath><clipPath id="f4"><path d="M100,108 L142,108 Q142,114 148,114 Q154,114 154,120 Q154,126 148,126 Q142,126 142,132 L200,132 L200,210 L100,210 L100,177 Q100,172 94,172 Q88,172 88,166 Q88,160 94,160 Q100,160 100,155Z"/></clipPath></defs>
+      <path d="M38,8 C52,4 82,3 100,7 C120,11 168,32 178,88 C176,106 174,118 178,136 C176,146 152,154 139,171 C120,171 100,168 80,177 C46,165 32,153 24,156 C13,163 6,144 8,128 C10,116 6,92 13,33 C16,19 30,12 38,8Z" fill="rgba(255,255,255,0.55)" clip-path="url(#f1)"/>
+      <path d="M38,8 C52,4 82,3 100,7 C120,11 168,32 178,88 C176,106 174,118 178,136 C176,146 152,154 139,171 C120,171 100,168 80,177 C46,165 32,153 24,156 C13,163 6,144 8,128 C10,116 6,92 13,33 C16,19 30,12 38,8Z" fill="rgba(255,255,255,0.3)" clip-path="url(#f2)"/>
+      <path d="M38,8 C52,4 82,3 100,7 C120,11 168,32 178,88 C176,106 174,118 178,136 C176,146 152,154 139,171 C120,171 100,168 80,177 C46,165 32,153 24,156 C13,163 6,144 8,128 C10,116 6,92 13,33 C16,19 30,12 38,8Z" fill="rgba(255,255,255,0.18)" clip-path="url(#f3)"/>
+      <path d="M38,8 C52,4 82,3 100,7 C120,11 168,32 178,88 C176,106 174,118 178,136 C176,146 152,154 139,171 C120,171 100,168 80,177 C46,165 32,153 24,156 C13,163 6,144 8,128 C10,116 6,92 13,33 C16,19 30,12 38,8Z" fill="rgba(255,255,255,0.1)" clip-path="url(#f4)"/>
+      <line x1="100" y1="3" x2="100" y2="178" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <line x1="6" y1="108" x2="181" y2="108" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+    </svg>
+    <div>
+      <div class="footer-name">Noelia Foundation</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px;">U.S.-Based 501(c)(3) · Fairfax, VA · Serving Latin America</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;">
+    <span style="cursor:pointer;font-size:12px;color:rgba(255,255,255,0.38);" onclick="goTo('home')">Home</span>
+    <span style="cursor:pointer;font-size:12px;color:rgba(255,255,255,0.38);" onclick="goTo('about')">About</span>
+    <span style="cursor:pointer;font-size:12px;color:rgba(255,255,255,0.38);" onclick="goTo('programs')">Programs</span>
+    <span style="cursor:pointer;font-size:12px;color:rgba(255,255,255,0.38);" onclick="goTo('impact')">Impact</span>
+    <span style="cursor:pointer;font-size:12px;color:rgba(255,255,255,0.38);" onclick="goTo('give')">Give</span>
+    <span style="cursor:pointer;font-size:12px;color:rgba(255,255,255,0.38);" onclick="goTo('contact')">Contact</span>
+  </div>
+  <div style="text-align:right;">
+    <div style="font-size:11.5px;color:rgba(255,255,255,0.35);">© 2026 Noelia Foundation</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:3px;">EIN: XX-XXXXXXX · All gifts tax-deductible</div>
+  </div>
+</footer>
+
+<script>
+function goTo(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-a').forEach(a=>a.classList.remove('active-page'));
+  const el=document.getElementById('nav-'+p);
+  if(el)el.classList.add('active-page');
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.nav-li').forEach(li=>{
+  li.addEventListener('mouseenter',()=>li.classList.add('open'));
+  li.addEventListener('mouseleave',()=>li.classList.remove('open'));
+});
+</script>
+</body>
+</html>
